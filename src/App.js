@@ -18,7 +18,6 @@ const OnSelect = ({ setCurrentSelected, setGlobalSelected }) => {
     return null;
   }
   setGlobalSelected(selected);
-  console.log(selected);
   selected.forEach((item) => {
     item.material.color.b = 15;
   });
@@ -28,38 +27,37 @@ const OnSelect = ({ setCurrentSelected, setGlobalSelected }) => {
 export default function App() {
   const [currentSelected, setCurrentSelected] = useState(null);
   const [selectedLists, setSelectedLists] = useState([]);
-  const [color, setColor] = useState("black");
   const [componentList, setComponentList] = useState([]);
-  const [globalSelected, setGlobalSelected] = useState([]);
+  const [globalSelected, setGlobalSelected] = useState(null);
 
   const btnStyling =
     "bg-slate-500 px-2 mx-1 text-xs rounded-full text-neutral-200 shadow-sm";
 
   useEffect(() => {
-    generateRandomCubes(24);
+    const Cube = ({ x, y, z, color, ...props }) => {
+      return (
+        <mesh position={[x, y, z]}>
+          <boxGeometry args={[0.2, 0.2, 0.2]} />
+          <meshStandardMaterial color={color} />
+        </mesh>
+      );
+    };
+
+    const generateRandomCubes = (max) => {
+      for (let i = 0; i < max; i++) {
+        let x = getRandomArbitrary(-8, 8);
+        let y = getRandomArbitrary(-8, 8);
+        let z = getRandomArbitrary(-8, 8);
+        let cubeComponent = (
+          <Cube key={uniqid()} x={x} y={y} z={z} color="black" />
+        );
+        /* setComponentList([...componentList, cubeoC]) */
+        componentList.push(cubeComponent);
+      }
+    };
+    generateRandomCubes(64);
     console.log("Mounted");
   }, []);
-
-  const Cube = ({ x, y, z, color, ...props }) => {
-    return (
-      <mesh position={[x, y, z]}>
-        <boxGeometry args={[0.2, 0.2, 0.2]} />
-        <meshStandardMaterial color={color} />
-      </mesh>
-    );
-  };
-
-  const generateRandomCubes = (max) => {
-    for (let i = 0; i < max; i++) {
-      let x = getRandomArbitrary(-5, 5);
-      let y = getRandomArbitrary(-5, 5);
-      let z = getRandomArbitrary(-5, 5);
-      let cubeComponent = (
-        <Cube key={uniqid()} x={x} y={y} z={z} color={color} />
-      );
-      componentList.push(cubeComponent);
-    }
-  };
 
   const saveToList = () => {
     setSelectedLists([...selectedLists, globalSelected]);
@@ -107,6 +105,7 @@ export default function App() {
         break;
     }
   };
+
   const toggleVisible = (list) => {
     list.forEach((item) => (item.visible = !item.visible));
   };
@@ -114,13 +113,14 @@ export default function App() {
     if (toggle == "on") list.forEach((item) => (item.material.color.r = 15));
     else list.forEach((item) => (item.material.color.r = 0));
   };
-  const resetColors = () => {
+  function resetColors() {
     if (globalSelected != null) {
       globalSelected.forEach((item) => {
+        console.log("resetColors");
         item.material.color.b = 0;
       });
     }
-  };
+  }
   const displaySelectedLists = () => {
     if (selectedLists.length == 0) return <div>No object lists yet.</div>;
     return selectedLists.map((item, index) => {
@@ -159,7 +159,6 @@ export default function App() {
         {displaySelectedLists()}
       </div>
       <div
-        id="canvas"
         onMouseDown={resetColors}
         onMouseUp={() => {
           resetColors();
@@ -172,7 +171,7 @@ export default function App() {
           dpr={[1, 2]}
           orthographic
           camera={{ position: [-10, 10, 10], zoom: 50 }}
-          className="flex-2 border-8"
+          className="flex-2 border-8 h-full"
         >
           <ambientLight intensity={0.1} />
           <Suspense fallback={null}>
