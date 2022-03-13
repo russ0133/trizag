@@ -9,6 +9,7 @@ import {
 } from "@react-three/drei";
 import "./App.css";
 import uniqid from "uniqid";
+import { hydrate } from "react-dom";
 
 const OnSelect = ({ setCurrentSelected, setGlobalSelected }) => {
   const selected = useSelect();
@@ -61,10 +62,16 @@ export default function App() {
   }, []);
 
   const saveToList = () => {
-    setSelectedLists([...selectedLists, globalSelected]);
+    let insert = { id: uniqid(), content: globalSelected };
+    setSelectedLists([...selectedLists, insert]);
     clearSelection();
   };
-
+  const deleteFromList = (targetid) => {
+    let found = selectedLists.find((list) => list.id === targetid);
+    console.log(`Deleted list.`);
+    let filtered = selectedLists.filter((param) => param !== found);
+    setSelectedLists(filtered);
+  };
   const displaySelectedObjects = () => {
     if (currentSelected == null)
       return (
@@ -136,23 +143,44 @@ export default function App() {
     return selectedLists.map((item, index) => {
       return (
         <div
-          className="bg-neutral-300 px-2 py-1 shadow-sm hover:bg-slate-400 rounded-md mb-1"
-          key={index}
-          onMouseEnter={() => toggleHighlighted("on", item)}
-          onMouseLeave={() => toggleHighlighted("off", item)}
+          className="bg-neutral-300 px-2 py-1 shadow-sm hover:bg-slate-400 rounded-md mb-1 text-sm"
+          key={item.id}
+          onMouseEnter={() => toggleHighlighted("on", item.content)}
+          onMouseLeave={() => toggleHighlighted("off", item.content)}
         >
-          List ID {index} contains {item.length} objects.<br></br>
-          <button className={btnStyling} onClick={() => changeScale("x", item)}>
+          List {index}: contains {item.content.length} objects.<br></br>
+          <button
+            className={btnStyling}
+            onClick={() => changeScale("x", item.content)}
+          >
             scaleX
           </button>
-          <button className={btnStyling} onClick={() => changeScale("y", item)}>
+          <button
+            className={btnStyling}
+            onClick={() => changeScale("y", item.content)}
+          >
             scaleY
           </button>
-          <button className={btnStyling} onClick={() => changeScale("z", item)}>
+          <button
+            className={btnStyling}
+            onClick={() => changeScale("z", item.content)}
+          >
             scaleZ
           </button>
-          <button className={btnStyling} onClick={() => toggleVisible(item)}>
+          <button
+            className={btnStyling}
+            onClick={() => toggleVisible(item.content)}
+          >
             visible
+          </button>
+          <button
+            className={btnStyling + " bg-red-500"}
+            onClick={() => {
+              toggleHighlighted("off", item.content);
+              deleteFromList(item.id);
+            }}
+          >
+            destroy list
           </button>
         </div>
       );
@@ -164,7 +192,7 @@ export default function App() {
       className="flex flex-col items-center h-screen bg-neutral-200 "
     >
       <div>{displaySelectedObjects()}</div>
-      <div className="lists mt-2 items-center text-center text-sm">
+      <div className="lists mt-2 items-center text-center">
         <strong>Your saved object lists:</strong>
         {displaySelectedLists()}
       </div>
