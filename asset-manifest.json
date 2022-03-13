@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.css": "/static/css/main.aa19de45.css",
-    "main.js": "/static/js/main.d9c2d42e.js",
-    "index.html": "/index.html",
-    "main.aa19de45.css.map": "/static/css/main.aa19de45.css.map",
-    "main.d9c2d42e.js.map": "/static/js/main.d9c2d42e.js.map"
+    "main.css": "/trizag/static/css/main.aa19de45.css",
+    "main.js": "/trizag/static/js/main.d9c2d42e.js",
+    "index.html": "/trizag/index.html",
+    "main.aa19de45.css.map": "/trizag/static/css/main.aa19de45.css.map",
+    "main.d9c2d42e.js.map": "/trizag/static/js/main.d9c2d42e.js.map"
   },
   "entrypoints": [
     "static/css/main.aa19de45.css",
