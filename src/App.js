@@ -1,4 +1,4 @@
-import React, { useState, Suspense, useEffect } from "react";
+import React, { useState, Suspense, useEffect, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import {
   Select,
@@ -35,6 +35,7 @@ export default function App() {
 
   useEffect(() => {
     const Cube = ({ x, y, z, color, ...props }) => {
+      const [cls, setCls] = useState("blue");
       return (
         <mesh position={[x, y, z]}>
           <boxGeometry args={[0.2, 0.2, 0.2]} />
@@ -61,6 +62,7 @@ export default function App() {
 
   const saveToList = () => {
     setSelectedLists([...selectedLists, globalSelected]);
+    clearSelection();
   };
 
   const displaySelectedObjects = () => {
@@ -116,9 +118,17 @@ export default function App() {
   function resetColors() {
     if (globalSelected != null) {
       globalSelected.forEach((item) => {
-        console.log("resetColors");
         item.material.color.b = 0;
       });
+    }
+  }
+  function clearSelection() {
+    if (window.getSelection) {
+      console.log("selection cleared");
+      window.getSelection().removeAllRanges();
+    } else if (document.selection) {
+      console.log("selection not cleared");
+      document.selection.empty();
     }
   }
   const displaySelectedLists = () => {
@@ -170,7 +180,7 @@ export default function App() {
           colorManagement
           dpr={[1, 2]}
           orthographic
-          camera={{ position: [-10, 10, 10], zoom: 50 }}
+          camera={{ position: [-10, 10, 10], zoom: 25 }}
           className="flex-2 border-8 h-full"
         >
           <ambientLight intensity={0.1} />
@@ -192,7 +202,11 @@ export default function App() {
             minPolarAngle={0}
             maxPolarAngle={Math.PI / 2.5}
           />
-          <Sky />
+          <Sky
+            distance={450000} // Camera distance (default=450000)
+            sunPosition={[0, 2, 0]} // Sun position normal (defaults to inclination and azimuth if not set)
+            inclination={1} // Sun elevation angle from 0 to 1 (default=0)
+          />
         </Canvas>
       </div>
     </div>
