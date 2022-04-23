@@ -9,7 +9,6 @@ import {
 } from "@react-three/drei";
 import "./App.css";
 import uniqid from "uniqid";
-import { hydrate } from "react-dom";
 
 const OnSelect = ({ setCurrentSelected, setGlobalSelected }) => {
   const selected = useSelect();
@@ -30,15 +29,17 @@ export default function App() {
   const [selectedLists, setSelectedLists] = useState([]);
   const [componentList, setComponentList] = useState([]);
   const [globalSelected, setGlobalSelected] = useState(null);
+  const cubesRef = useRef([]);
 
   const btnStyling =
     "bg-slate-500 px-2 mx-1 text-xs rounded-full text-neutral-200 shadow-sm";
 
+  useEffect(() => {}, componentList);
+
   useEffect(() => {
-    const Cube = ({ x, y, z, color, ...props }) => {
-      const [cls, setCls] = useState("blue");
+    const Cube = ({ x, y, z, color, id, ...props }) => {
       return (
-        <mesh position={[x, y, z]}>
+        <mesh position={[x, y, z]} ref={(el) => cubesRef.current.push(el)}>
           <boxGeometry args={[0.2, 0.2, 0.2]} />
           <meshStandardMaterial color={color} />
         </mesh>
@@ -51,13 +52,12 @@ export default function App() {
         let y = getRandomArbitrary(-8, 8);
         let z = getRandomArbitrary(-8, 8);
         let cubeComponent = (
-          <Cube key={uniqid()} x={x} y={y} z={z} color="black" />
+          <Cube key={uniqid()} x={x} y={y} z={z} id={i} color="black" />
         );
-        /* setComponentList([...componentList, cubeoC]) */
         componentList.push(cubeComponent);
       }
     };
-    generateRandomCubes(64);
+    generateRandomCubes(6);
     console.log("Mounted");
   }, []);
 
@@ -191,6 +191,15 @@ export default function App() {
       id="wrapper"
       className="flex flex-col items-center h-screen bg-neutral-200 "
     >
+      <button
+        className={btnStyling}
+        onClick={() => {
+          console.log(cubesRef);
+          cubesRef.current[1].scale.y = 150;
+        }}
+      >
+        Test
+      </button>
       <div>{displaySelectedObjects()}</div>
       <div className="lists mt-2 items-center text-center">
         <strong>Your saved object lists:</strong>
